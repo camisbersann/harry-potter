@@ -145,6 +145,20 @@ app.get('/bruxos/:id', async (req,res) => {
     }
 })
 
+app.get('/bruxos/:nome', async (req,res) => {
+    try {
+        const { nome } = req.params;
+        const resultado = await pool.query('SELECT * FROM bruxos WHERE nome = $1', [nome]);
+        res.json({
+            bruxo: resultado.rows[0]
+        });
+        
+    } catch (error) {
+        console.error('Erro ao obter bruxo pelo nome', error); 
+        res.status(500).send('Erro ao obter bruxo pelo nome');
+    }
+})
+
 app.get('/varinhas/:id', async (req,res) => {
     try {
         const { id } = req.params;
