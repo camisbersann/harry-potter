@@ -48,6 +48,17 @@ app.post('/bruxos', async (req, res) => {
     try {
         const { nome, idade, casa_hogwarts, habilidade_especial, status_sangue, patrono } = req.body;
 
+        let sangues=['puro', 'mestiço', 'trouxa'];
+        let casas=['Grifinória', 'Sonserina', 'Lufa-Lufa', 'Corvinal'];
+
+        if(!sangues.includes(status_sangue)){
+            return res.status(400).send({ message: 'Status de Sangue inválida'})
+        }
+
+        if(!casas.includes(casa_hogwarts)){
+            return res.status(400).send({ message: 'Casa de Hogwarts inválida'})
+        }
+
         await pool.query('INSERT INTO bruxos (nome, idade, casa_hogwarts, habilidade_especial, status_sangue, patrono) VALUES ($1, $2, $3, $4, $5, $6)', [nome, idade, casa_hogwarts, habilidade_especial, status_sangue, patrono]);
         res.status(201).send({ mensagem: 'Bruxo criado com sucesso! 💋' });
     }   catch (error) {
