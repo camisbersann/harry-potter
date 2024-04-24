@@ -145,7 +145,7 @@ app.get('/bruxos/:id', async (req,res) => {
     }
 })
 
-app.get('/bruxos/:id', async (req,res) => {
+app.get('/varinhas/:id', async (req,res) => {
     try {
         const { id } = req.params;
         const resultado = await pool.query('SELECT * FROM varinhas WHERE id = $1', [id]);
