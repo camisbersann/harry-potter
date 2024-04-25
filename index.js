@@ -4,6 +4,7 @@ const { Pool } = require('pg');
 const app = express();
 const PORT= 4000;
 
+//Conexão com o banco de dados PostgreSQL;
 const pool = new Pool({
     user: 'postgres',
     host: 'localhost',
@@ -14,10 +15,12 @@ const pool = new Pool({
 
 app.use(express.json());
 
+//Rota de teste;
 app.get('/', (req, res) => {
     res.send('A rota está funcionado!')
 });
 
+//Rota para obter todos os bruxos;
 app.get('/bruxos', async (req, res) => {
     try {
         const resultado = await pool.query('SELECT * FROM bruxos');
@@ -31,6 +34,7 @@ app.get('/bruxos', async (req, res) => {
     }
 });
 
+//Rota para obter todas as varinhas;
 app.get('/varinhas', async (req, res) => {
     try {
         const resultado = await pool.query('SELECT * FROM varinhas');
@@ -44,6 +48,7 @@ app.get('/varinhas', async (req, res) => {
     }
 });
 
+//Rota para criar um novo bruxo;
 app.post('/bruxos', async (req, res) => {
     try {
         const { nome, idade, casa_hogwarts, habilidade_especial, status_sangue, patrono } = req.body;
@@ -67,6 +72,7 @@ app.post('/bruxos', async (req, res) => {
     }
 });
 
+//Rota para criar uma nova varinha;
 app.post('/varinhas', async (req, res) => {
     try {
         const { material, comprimento, nucleo, data_fabricacao } = req.body;
@@ -79,6 +85,7 @@ app.post('/varinhas', async (req, res) => {
     }
 });
 
+//Rota para deletar um bruxo;
 app.delete('/bruxos/:id', async (req, res) => {
     try {
         const { id } = req.params;
@@ -90,6 +97,7 @@ app.delete('/bruxos/:id', async (req, res) => {
     }
 });
 
+//Rota para deletar uma varinha;
 app.delete('/varinhas/:id', async (req, res) => {
     try {
         const { id } = req.params;
@@ -101,6 +109,7 @@ app.delete('/varinhas/:id', async (req, res) => {
     }
 });
 
+//Rota para atualizar um bruxo;
 app.put('/bruxos/:id', async (req, res) => {
     try {
         const { id } = req.params;
@@ -114,6 +123,7 @@ app.put('/bruxos/:id', async (req, res) => {
     }
 });
 
+//Rota para atualizar uma varinha;
 app.put('/varinhas/:id', async (req, res) => {
     try {
         const { id } = req.params;
@@ -127,38 +137,59 @@ app.put('/varinhas/:id', async (req, res) => {
     }
 });
 
-app.get('/bruxos/:id', async (req,res) => {
+//Rota para obter bruxo por id;
+// app.get('/bruxos/:id', async (req,res) => {
+//     try {
+//         const { id } = req.params;
+//         const resultado = await pool.query('SELECT * FROM bruxos WHERE id = $1', [id]);
+//         if(resultado.rowCount == 0){
+//             res.status(404).send({mensagem: 'Id não encontrado'})
+//         } else{
+//             res.json({
+//                 bruxo: resultado.rows[0],
+//             });
+//         }
+        
+//     } catch (error) {
+//         console.error('Erro ao obter bruxo pelo id', error); 
+//         res.status(500).send('Erro ao obter bruxo pelo id');
+//     }
+// })
+
+//Rota para obter bruxo pelo nome;
+// app.get('/bruxos/:nome', async (req,res) => {
+//     try {
+//         const { nome } = req.params;
+//         const resultado = await pool.query('SELECT * FROM bruxos WHERE nome = $1', [nome]);
+//         res.json({
+//             bruxo: resultado.rows[0]
+//         });
+        
+//     } catch (error) {
+//         console.error('Erro ao obter bruxo pelo nome', error); 
+//         res.status(500).send('Erro ao obter bruxo pelo nome');
+//     }
+// });
+
+//Rota para obter bruxo pelo nome;
+ app.get('/bruxos/:filter', async (req, res) => {
     try {
-        const { id } = req.params;
-        const resultado = await pool.query('SELECT * FROM bruxos WHERE id = $1', [id]);
-        if(resultado.rowCount == 0){
-            res.status(404).send({mensagem: 'Id não encontrado'})
-        } else{
-            res.json({
-                bruxo: resultado.rows[0],
-            });
+        const { filter } = req.params;
+
+        if (isNaN(req.params.filter)){
+            const result = await pool.query('SELECT * FROM bruxos WHERE nome LIKE $1', [`%${filter}%`]);
+            res.status(200).json(result.rows[0]);
+        } else {
+            const result = await pool.query('SELECT * FROM bruxos WHERE  = $1', [filter]);
+            res.status(200).json(result.rows[0]);
         }
-        
     } catch (error) {
-        console.error('Erro ao obter bruxo pelo id', error); 
-        res.status(500).send('Erro ao obter bruxo pelo id');
+         console.error('Erro ao obter bruxo pelo nome', error); 
+         res.status(500).send('Erro ao obter bruxo pelo nome');
     }
-})
+ })
 
-app.get('/bruxos/:nome', async (req,res) => {
-    try {
-        const { nome } = req.params;
-        const resultado = await pool.query('SELECT * FROM bruxos WHERE nome = $1', [nome]);
-        res.json({
-            bruxo: resultado.rows[0]
-        });
-        
-    } catch (error) {
-        console.error('Erro ao obter bruxo pelo nome', error); 
-        res.status(500).send('Erro ao obter bruxo pelo nome');
-    }
-})
-
+//Rota para obter varinha por id;
 app.get('/varinhas/:id', async (req,res) => {
     try {
         const { id } = req.params;
@@ -177,6 +208,7 @@ app.get('/varinhas/:id', async (req,res) => {
     }
 })
 
+// Rota para iniciar o servidor na porta especificada;
 app.listen(PORT, () => {
     console.log(`Servidor rodando na porta ${PORT}`);
 });
